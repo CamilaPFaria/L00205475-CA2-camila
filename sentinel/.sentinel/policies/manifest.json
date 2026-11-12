@@ -1,0 +1,10 @@
+{
+	"records": [
+		{
+			"key": "restrict-aws-region",
+			"source": "./restrict-aws-region.sentinel",
+			"sourceSum": "",
+			"dest": "C:/Users/Camila/L00205475-CA2-camila-main/sentinel/restrict-aws-region.sentinel"
+		}
+	]
+}

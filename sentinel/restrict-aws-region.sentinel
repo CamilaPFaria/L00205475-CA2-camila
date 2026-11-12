@@ -1,0 +1,8 @@
+import "tfplan/v2" as tfplan
+
+main = rule {
+	all tfplan.resource_changes as _, rc {
+		rc.change.after.region is "eu-west-1" or
+			rc.change.after.region is "eu-central-1"
+	}
+}
