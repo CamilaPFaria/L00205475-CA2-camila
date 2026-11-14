@@ -29,17 +29,14 @@ resource "aws_instance" "web" {
     Name = "Web Server $"
     Sovereignty = "EU-only"
   }
+  #The metadata_options block is used to configure the instance metadata service (IMDS) settings for the EC2 instance.
+  #Ref.: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_instance_metadata_defaults
+  metadata_options {
+    http_tokens                 = "required" # Enforces IMDSv2
+    http_endpoint               = "enabled"  # Enables metadata servic
 }
-#The data needs to be stored in European regions, so the resouces will be deployed in Ireland and Frankfurt. 
-resource "aws_ebs_volume" "database"{ 
-    availability_zone = var.aws_AZ[0]
-    size              =  10
-    encrypted = true 
-    tags = {
-        Name = "Database Volume $"
-        Sovereignty = "EU-only"
-    }
-}    
+}
+
 #it makes sure that the data is encrypted for all ebs resources created in the account even if not explicitly specified in the resource definition.
 resource "aws_ebs_encryption_by_default" "enable" {
   enabled = true

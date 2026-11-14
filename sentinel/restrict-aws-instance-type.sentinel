@@ -1,0 +1,17 @@
+import "tfplan/v2" as tfplan
+
+allowed_types = ["t3.micro"] #allowed instance type
+
+ec2_instances = filter tfplan.resource_changes as _, rc { #map of all resources in the plan that are of type aws_instance and are being created
+  rc.type is "aws_instance" and
+  rc.mode is "managed" and #filter only evaluates resources created/managed by Terraform
+  rc.change.actions is ["create"]
+}
+
+main = rule {
+  all ec2_instances as _, instance {
+    instance.change.after.instance_type in allowed_types and #check if instance type is part of the allowed list
+    instance.change.after.metadata_options[0].http_tokens is "required" #metadata_options[0] selects the first element and checks if http_tokens is set.
+  }
+}
+
