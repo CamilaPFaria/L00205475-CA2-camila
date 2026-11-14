@@ -28,3 +28,10 @@ References:
 
 https://developer.hashicorp.com/terraform/tutorials/aws-get-started/aws-create Accessed on 11/11/2026
 https://developer.hashicorp.com/terraform/tutorials/policy/sentinel-cloud-integration Accessed on 10/11/2026
+https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_instance_metadata_defaults Accessed on 14/11/2026
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-IMDS-new-instances.html Accessed on 14/11/2026
+
+https://developer.hashicorp.com/sentinel/docs/features/terraform/tfplan-v2 Accessed on 14/11/2026
+https://developer.hashicorp.com/sentinel/docs/language/rules Accessed on 14/11/2026
+
+

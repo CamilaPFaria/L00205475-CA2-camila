@@ -10,3 +10,8 @@ policy "restrict-aws-region"{
     source            = "./restrict-aws-region.sentinel"
     enforcement_level = "hard-mandatory"
 }
+
+policy "restrict-aws-instance-type"{
+    source            = "./restrict-aws-instance-type.sentinel"
+    enforcement_level = "hard-mandatory"
+}
