@@ -31,6 +31,9 @@ security_groups = filter tfplan.resource_changes as _, rc {
 
 # Check Provider Region (eu-west-1)
 check_region = rule {
+  all ec2_instances as _, inst {
+    (inst.change.after.availability_zone else "") matches "^eu-west-1"
+  } or
   (tfplan.configuration.provider_config.aws.expressions.region.constant_value else "") == allowed_region
 }
 
