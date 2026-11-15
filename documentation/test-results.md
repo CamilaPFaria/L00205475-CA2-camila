@@ -1,4 +1,4 @@
-# Project Development & Policy Validation Report
+# Project Development AND Policy Validation Report
 
 ## 1. Local Testing and Validation
 During the development of the project, local tests were conducted to validate the Sentinel policies against the Terraform plan:
