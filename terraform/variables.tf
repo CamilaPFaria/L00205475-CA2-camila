@@ -23,6 +23,7 @@ variable "aws_ebs_volume" {
 variable "vpc_id" {
   description = "ID of the VPC where the Security Group will be created"
   type        = string
+  default     = "vpc-default" # Replace with your specific VPC ID
 }
 
 variable "admin_ip" {

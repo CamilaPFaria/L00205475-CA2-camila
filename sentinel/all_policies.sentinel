@@ -1,0 +1,89 @@
+import "tfplan/v2" as tfplan
+
+# Global Allowed Values
+allowed_types  = ["t3.micro"]
+allowed_region = "eu-west-1"
+
+# -----------------------------------------------------------------
+# 1. Filtered Resource Lists (Using standard tfplan/v2 schema)
+# -----------------------------------------------------------------
+ec2_instances = filter tfplan.resource_changes as _, rc {
+  rc.type is "aws_instance" and
+  rc.mode is "managed" and
+  (rc.change.actions contains "create" or rc.change.actions contains "update")
+}
+
+ebs_volumes = filter tfplan.resource_changes as _, rc {
+  rc.type is "aws_ebs_volume" and
+  rc.mode is "managed" and
+  (rc.change.actions contains "create" or rc.change.actions contains "update")
+}
+
+security_groups = filter tfplan.resource_changes as _, rc {
+  rc.type is "aws_security_group" and
+  rc.mode is "managed" and
+  (rc.change.actions contains "create" or rc.change.actions contains "update")
+}
+
+# -----------------------------------------------------------------
+# 2. Individual Sub-Rules
+# -----------------------------------------------------------------
+
+# Check Provider Region (eu-west-1)
+check_region = rule {
+  (tfplan.configuration.provider_config.aws.expressions.region.constant_value else "") == allowed_region
+}
+
+# Check EC2 Instance Type (t3.micro) & IMDSv2 (http_tokens = required)
+check_instance_type_and_imdsv2 = rule {
+  all ec2_instances as _, inst {
+    (inst.change.after.instance_type else "") in allowed_types and
+    ((inst.change.after.metadata_options else [{}])[0].http_tokens else "") is "required"
+  }
+}
+
+# Check Root Block Device Encryption for EC2
+check_ec2_root_encryption = rule {
+  all ec2_instances as _, inst {
+    all (inst.change.after.root_block_device else []) as disk {
+      disk.encrypted is true
+    }
+  }
+}
+
+# Check Standalone EBS Volume Encryption
+check_ebs_encryption = rule {
+  all ebs_volumes as _, vol {
+    (vol.change.after.encrypted else false) is true
+  }
+}
+
+# Check Security Group Ingress Rules (No SSH from 0.0.0.0/0 & DB SG restrictions)
+check_network_security = rule {
+  (all security_groups as _, sg {
+    all (sg.change.after.ingress else []) as ingress_rule {
+      not (
+        ((ingress_rule.from_port else 0) <= 22) and
+        ((ingress_rule.to_port else 0) >= 22) and
+        ("0.0.0.0/0" in (ingress_rule.cidr_blocks else []))
+      )
+    }
+  }) and
+  (all security_groups as _, sg {
+    ((sg.change.after.name else "") != "db-tier-sg") or (all (sg.change.after.ingress else []) as ingress_rule {
+      length(ingress_rule.cidr_blocks else []) == 0
+    })
+  })
+}
+
+# -----------------------------------------------------------------
+# 3. Single MAIN Rule (Combines all checks)
+# -----------------------------------------------------------------
+main = rule {
+  check_region and
+  check_instance_type_and_imdsv2 and
+  check_ec2_root_encryption and
+  check_ebs_encryption and
+  check_network_security
+}
+

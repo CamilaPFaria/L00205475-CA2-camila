@@ -1,0 +1,24 @@
+import "tfplan/v2" as tfplan
+
+allowed_types = ["t3.micro"]
+
+# Filter all managed aws_instance resources being created or updated
+ec2_instances = filter tfplan.resource_changes as _, rc {
+  rc.type is "aws_instance" and
+  rc.mode is "managed" and
+  (rc.change.actions contains "create" or rc.change.actions contains "update")
+}
+
+# Rule checks instance type and safe IMDSv2 metadata enforcement
+main = rule {
+  all ec2_instances as _, instance {
+    instance.change.after.instance_type in allowed_types and
+    
+    # 1. Ensure metadata_options block exists and is not empty
+    ("metadata_options" in instance.change.after and 
+     length(instance.change.after.metadata_options) > 0) and
+    
+    # 2. Check http_tokens safely
+    instance.change.after.metadata_options[0].http_tokens is "required"
+  }
+}

@@ -29,3 +29,7 @@ policy "restrict-aws-instance-encryption" {
   source            = "./restrict-aws-instance-encryption.sentinel"
   enforcement_level = "hard-mandatory"
 }
+policy "restrict-aws-instance-metadata" {
+  source            = "./restrict-aws-instance-metadata.sentinel"
+  enforcement_level = "hard-mandatory"
+}
