@@ -1,43 +1,59 @@
 # L00205475-CA2-camila
 CA2 for the IaC Devops pipelines module
 
-Policy as Code & Digital Sovereignty
-Overview
+# CA2 for the IaC DevOps Pipelines Module
 
-Policy as Code is a great way to guarantee digital sovereignty. Having automation that helps ensure that the organisation's infrastructure follows the required standards is fundamental nowadays, considering the fast pace of technological development and the constant release of new features and updates.
+---
 
-However, there are some limitations related to the fact that, even when data is stored in a specific region, the physical equipment might still be managed by external personnel from another country.
+## Policy as Code & Digital Sovereignty Overview
 
-Therefore, digital sovereignty is not entirely achievable in a cloud environment in the same way it would be with on-premises solutions. Additionally, AWS and Azure providers, for example, are subject to US laws, such as the Cloud Act, even if their servers are located in Europe. This adds further complexity to the challenge of guaranteeing digital sovereignty.
+**Policy as Code (PaC)** is a fundamental approach to enforcing digital sovereignty. Having automated guardrails to ensure an organization's infrastructure continuously adheres to required governance standards is critical, given the rapid pace of technological development and continuous deployment cycles.
 
-Justifications Based on DORA, ISO, and Digital Sovereignty
+However, inherent limitations exist within cloud environments. Even when data is stored within a specific geographical region, the underlying physical hardware may still be managed by foreign personnel or entity structures. 
 
-The following requirements and considerations were identified to improve infrastructure security, resilience, and alignment with digital sovereignty principles.
+Consequently, complete digital sovereignty is not fully achievable in a public cloud environment in the same manner as an on-premises architecture. Furthermore, major cloud service providers (such as AWS and Azure) remain subject to US laws—such as the **US CLOUD Act**—regardless of whether their physical servers reside within European borders. This introduces significant legal and jurisdictional complexity when guaranteeing total digital sovereignty.
 
-1. EU Regional Deployment
-Resources should be deployed only in EU regions to ensure that infrastructure and data remain within European jurisdictions.
-2. Data Encryption
-All data must be encrypted both at rest and in transit to guarantee data confidentiality and security.
-3. Multi-Region Deployment
-Resources should be deployed in another European region to guarantee disaster recovery and availability, which are requirements under DORA.
-This ensures that if one AWS data centre experiences an outage, the application remains running in the second region, satisfying resilience and high-availability requirements under DORA while keeping all data within the EU.
-4. Access Control
-Access to resources from regions outside Europe should be restricted and controlled to improve security and maintain control over the infrastructure.
-5. End-to-End Encryption
-Critical communication platforms should implement end-to-end encryption to guarantee the confidentiality and security of communications.
-Note: Out of scope for this implementation.
-6. Database Security
-Databases should be located in European regions and use encryption to protect stored data.
-Conclusion
+---
+
+## Technical Justifications Based on DORA, ISO, and Digital Sovereignty
+
+The following requirements and considerations were identified to improve infrastructure security, resilience, and alignment with digital sovereignty principles:
+
+1. **EU Regional Deployment**  
+   Resources should be deployed only in EU regions to ensure that infrastructure and data remain within European jurisdictions.
+
+2. **Data Encryption**  
+   All data must be encrypted both at rest and in transit to guarantee data confidentiality and security.
+
+3. **Multi-Region Deployment**  
+   Resources should be deployed in another European region to guarantee disaster recovery and availability, which are requirements under DORA. This ensures that if one AWS data centre experiences an outage, the application remains running in the second region, satisfying resilience and high-availability requirements under DORA while keeping all data within the EU.
+
+4. **Access Control**  
+   Access to resources from regions outside Europe should be restricted and controlled to improve security and maintain control over the infrastructure.
+
+5. **End-to-End Encryption**  
+   Critical communication platforms should implement end-to-end encryption to guarantee the confidentiality and security of communications.  
+   *(Note: Out of scope for this implementation).*
+
+6. **Database Security**  
+   Databases should be located in European regions and use encryption to protect stored data.
+
+---
+
+## Conclusion
 
 Policy as Code provides an important foundation for automating security and compliance requirements. However, achieving complete digital sovereignty in cloud environments remains challenging due to jurisdictional, operational, and infrastructure-related limitations.
 
 The requirements identified above provide a foundation for improving infrastructure security, operational resilience, and alignment with DORA, ISO standards, and European digital sovereignty principles.
 
-Technologies and Standards: AWS | Terraform | Sentinel | DORA | ISO | Digital Sovereignty
+---
 
+### Core Technologies & Regulatory Standards
+`AWS` | `Terraform` | `Sentinel` | `DORA` | `ISO` | `Digital Sovereignty`
 
-Declaration of AI Assistance:
+---
+
+## Declaration of AI Assistance
 
 In accordance with academic integrity guidelines, I declare that I utilized the Google Gemini (Gemini 3.6 Flash) AI assistant as a learning partner, thought partner, and code reviewer during the development of this assignment. The specific ways AI was incorporated into this project include:
 
