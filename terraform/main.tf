@@ -1,6 +1,6 @@
 #Ireland is the default deployment region for the resources considering the sovereignty and data residency requirements of the EU.
 provider "aws" {
-  region = "us-west-1" 
+  region = "eu-west-1" 
 }
 
 resource "aws_default_vpc" "default" {

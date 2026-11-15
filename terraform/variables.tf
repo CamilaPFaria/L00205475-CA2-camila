@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "Region where the resources will be created"
   type        = string
-  default     = "eu-west-1"
+  default     = "us-west-1"
 }
 variable "aws_AZ" {
   description = "Availability zone where the resources will be created"
