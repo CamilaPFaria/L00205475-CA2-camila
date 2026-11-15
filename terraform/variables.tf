@@ -33,8 +33,3 @@ variable "sovereignty_tag" {
   description = "Tag enforcing data residency compliance"
   default     = "EU-only"
 }
-
-variable "admin_ip" {
-  type        = string
-  description = "CIDR block authorized for restricted SSH access"
-}
