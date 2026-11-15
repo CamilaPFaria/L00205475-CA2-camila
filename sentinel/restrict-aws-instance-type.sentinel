@@ -15,5 +15,3 @@ main = rule {
     instance.change.after.metadata_options[0].http_tokens is "required" #metadata_options[0] selects the first element and checks if http_tokens is set.
   }
 }
-
-

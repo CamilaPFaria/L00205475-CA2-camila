@@ -23,6 +23,22 @@ mock "tfplan/v2" {
               ]
             }
           }
+        },
+        db_sg = {
+          name = "db-tier-sg"
+          change = {
+            after = {
+              name = "db-tier-sg"
+              ingress = [
+                {
+                  from_port   = 5432
+                  to_port     = 5432
+                  protocol    = "tcp"
+                  cidr_blocks = []
+                }
+              ]
+            }
+          }
         }
       }
     }

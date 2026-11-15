@@ -1,0 +1,12 @@
+import "tfplan/v2" as tfplan
+
+# Safely retrieve aws_instance resources, defaulting to an empty map if undefined
+ec2_instances = tfplan.resources["aws_instance"] else {}
+
+main = rule {
+  all ec2_instances as _, instance {
+    all (instance.change.after.root_block_device else []) as disk {
+      disk.encrypted is true
+    }
+  }
+}

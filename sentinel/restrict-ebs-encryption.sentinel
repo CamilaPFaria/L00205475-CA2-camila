@@ -1,0 +1,10 @@
+import "tfplan/v2" as tfplan
+
+# Safely retrieve all aws_ebs_volume resources, defaulting to empty map if undefined
+ebs_volumes = tfplan.resources["aws_ebs_volume"] else {}
+
+main = rule {
+  all ebs_volumes as _, volume {
+    volume.change.after.encrypted is true
+  }
+}
