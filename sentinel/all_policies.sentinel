@@ -58,32 +58,34 @@ check_ebs_encryption = rule {
   }
 }
 
-# Check Security Group Ingress Rules (No SSH from 0.0.0.0/0 & DB SG restrictions)
-check_network_security = rule {
-  (all security_groups as _, sg {
+# Sub-Rule A: No Security Group allows SSH (port 22) from 0.0.0.0/0
+check_no_ssh_all = rule {
+  all security_groups as _, sg {
     all (sg.change.after.ingress else []) as ingress_rule {
-      not (
-        ((ingress_rule.from_port else 0) <= 22) and
-        ((ingress_rule.to_port else 0) >= 22) and
-        ("0.0.0.0/0" in (ingress_rule.cidr_blocks else []))
-      )
+      not (((ingress_rule.from_port else 0) <= 22) and ((ingress_rule.to_port else 0) >= 22) and ("0.0.0.0/0" in (ingress_rule.cidr_blocks else [])))
     }
-  }) and
-  (all security_groups as _, sg {
-    ((sg.change.after.name else "") != "db-tier-sg") or (all (sg.change.after.ingress else []) as ingress_rule {
-      length(ingress_rule.cidr_blocks else []) == 0
-    })
-  })
+  }
 }
 
+# Sub-Rule B: Database Security Group has NO direct CIDR block rules
+check_db_sg_restricted = rule {
+  all security_groups as _, sg {
+    ((sg.change.after.name else "") != "db-tier-sg") or
+    (all (sg.change.after.ingress else []) as ingress_rule {
+      length(ingress_rule.cidr_blocks else []) == 0
+    })
+  }
+}
+
+
 # -----------------------------------------------------------------
-# 3. Single MAIN Rule (Combines all checks)
+# 3. Single MAIN Rule (Combines all checks cleanly)
 # -----------------------------------------------------------------
 main = rule {
   check_region and
   check_instance_type_and_imdsv2 and
   check_ec2_root_encryption and
   check_ebs_encryption and
-  check_network_security
+  check_no_ssh_all and
+  check_db_sg_restricted
 }
-
