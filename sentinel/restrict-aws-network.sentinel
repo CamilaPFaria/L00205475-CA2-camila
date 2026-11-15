@@ -1,0 +1,55 @@
+import "tfplan/v2" as tfplan
+
+# Function 1: Check that no Security Group opens SSH (port 22) to 0.0.0.0/0
+check_ssh_restricted = func() {
+  valid = true
+
+  for tfplan.resources.aws_security_group as _, sg {
+    ingress_rules = sg.change.after.ingress else []
+
+    # Changed 'rule' to 'ingress_rule' to avoid keyword conflict
+    for ingress_rules as ingress_rule {
+      from_port = ingress_rule.from_port else 0
+      to_port   = ingress_rule.to_port else 0
+      cidrs     = ingress_rule.cidr_blocks else []
+
+      # Check if port 22 is included in the rule range
+      if (from_port <= 22 and to_port >= 22) {
+        if "0.0.0.0/0" in cidrs {
+          print("Violation: Security Group '", sg.name, "' allows unrestricted SSH (0.0.0.0/0).")
+          valid = false
+        }
+      }
+    }
+  }
+  return valid
+}
+
+# Function 2: Check that Database SG does not accept direct IP CIDR blocks
+check_db_isolated = func() {
+  valid = true
+
+  for tfplan.resources.aws_security_group as _, sg {
+    tags = sg.change.after.tags else {}
+
+    # Target the database security group by name or tag
+    if (tags["Name"] else "" == "db-tier-security-group" or sg.name == "db-tier-sg") {
+      ingress_rules = sg.change.after.ingress else []
+
+      # Changed 'rule' to 'ingress_rule' here as well
+      for ingress_rules as ingress_rule {
+        cidrs = ingress_rule.cidr_blocks else []
+        if length(cidrs) > 0 {
+          print("Violation: Database Security Group '", sg.name, "' cannot have public IP CIDR rules.")
+          valid = false
+        }
+      }
+    }
+  }
+  return valid
+}
+
+# Main Rule: BOTH checks must pass
+main = rule {
+  check_ssh_restricted() and check_db_isolated()
+}

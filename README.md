@@ -28,4 +28,6 @@ https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-IMDS-new-instanc
 https://developer.hashicorp.com/sentinel/docs/features/terraform/tfplan-v2 Accessed on 14/11/2026
 https://developer.hashicorp.com/sentinel/docs/language/rules Accessed on 14/11/2026
 
+https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc accessed on 15/11/2026
+
 
