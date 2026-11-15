@@ -90,7 +90,7 @@ resource "aws_security_group" "web-server-sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["192.168.0.0/16"]
+    
   }
 
   egress {
@@ -122,7 +122,7 @@ resource "aws_security_group" "db-server-sg" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = [var.admin_ip]
+    
   }
 
   # Outbound Rule
