@@ -12,13 +12,7 @@ data "aws_ami" "ubuntu" {
     name = "name"
     values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
   }
-
   owners = ["099720109477"] # Canonical
-}
-#In order to guarantee high availability and fault tolerance, the resources will be deployedin a second european region, Frankfurt.
-provider "aws"{
-    alias = Frankfurt
-    region = "eu-central-1" 
 }
 #Instance type is set to t3.micro, which is a cost-effective option for small workloads and testing purposes.
 resource "aws_instance" "web" {
@@ -33,13 +27,47 @@ resource "aws_instance" "web" {
   #Ref.: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_instance_metadata_defaults
   metadata_options {
     http_tokens                 = "required" # Enforces IMDSv2
-    http_endpoint               = "enabled"  # Enables metadata servic
+    http_endpoint               = "enabled"  # Enables metadata service
 }
+  root_block_device {#Enables root disk encryption for the EC2 instance.
+    encrypted = true
+  }
 }
-
+#EC2 instance to host the database server.
+resource "aws_instance" "db-server" {
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = "t3.micro"
+  availability_zone = var.aws_AZ[1]
+  tags = {
+    Name = "Database server"
+    Sovereignty = "EU-only"
+  }
+  metadata_options {
+    http_tokens                 = "required" # Enforces IMDSv2
+    http_endpoint               = "enabled"  # Enables metadata service
+}
+  root_block_device {#Enables root disk encryption for the EC2 instance.
+    encrypted = true
+  }
+}
 #it makes sure that the data is encrypted for all ebs resources created in the account even if not explicitly specified in the resource definition.
 resource "aws_ebs_encryption_by_default" "enable" {
   enabled = true
+}
+#EBS volume to be attached to the database server instance.
+resource "aws_ebs_volume" "database" {
+  availability_zone = var.aws_AZ[0]
+  size              = 50
+  encrypted         = true #enable encryption for the EBS volume
+  tags = {
+    Name = "Database Volume"
+    Sovereignty = "EU-only"
+  }
+}
+resource "aws_volume_attachment" "db-attach" {
+  device_name = "/dev/sdh"
+  volume_id   = aws_ebs_volume.database.id
+  instance_id = aws_instance.db-server.id
 }
 
 
