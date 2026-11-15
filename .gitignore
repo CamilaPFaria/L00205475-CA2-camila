@@ -1,3 +1,5 @@
+.sentinel/
+
 # Local .terraform directories
 .terraform/
 

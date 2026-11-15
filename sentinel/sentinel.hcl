@@ -25,3 +25,7 @@ policy "restrict-aws-network" {
   source            = "./restrict-aws-network.sentinel"
   enforcement_level = "hard-mandatory"
 }
+policy "restrict-aws-instance-encryption" {
+  source            = "./restrict-aws-instance-encryption.sentinel"
+  enforcement_level = "hard-mandatory"
+}

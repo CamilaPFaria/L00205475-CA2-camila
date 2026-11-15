@@ -1,15 +1,17 @@
 mock "tfplan/v2" {
   data = {
-    resource_changes = [
-      {
-        type = "aws_ebs_volume"
-        change = {
-          after = {
-            encrypted = false
+    resources = {
+      aws_ebs_volume = {
+        database_volume = {
+          name = "db-volume"
+          change = {
+            after = {
+              encrypted = false
+            }
           }
         }
       }
-    ]
+    }
   }
 }
 
