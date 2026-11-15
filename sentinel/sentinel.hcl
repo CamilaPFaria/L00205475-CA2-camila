@@ -33,3 +33,7 @@ policy "restrict-aws-instance-metadata" {
   source            = "./restrict-aws-instance-metadata.sentinel"
   enforcement_level = "hard-mandatory"
 }
+policy "all_policies" {
+  source            = "./all_policies.sentinel"
+  enforcement_level = "hard-mandatory"
+}
