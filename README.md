@@ -10,19 +10,13 @@ This repository contains the following files:
 - `variables.tf`: Defines two variables named `instance_name` and `instance_type`, both with default values.
 - `outputs.tf`: Defines one output named `instance_hostname`.
 
+Requirements:
+
 Terraform file configuration is based on the output of the terraform -version command. Ref.: https://developer.hashicorp.com/terraform/tutorials/aws-get-started/aws-create
 
 ![alt text](image-1.png)
 
 ![alt text](image.png)
-
-
-
-
-
-
-
-
 
 References:
 

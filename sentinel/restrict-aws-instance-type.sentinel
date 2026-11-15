@@ -11,6 +11,7 @@ ec2_instances = filter tfplan.resource_changes as _, rc { #map of all resources 
 main = rule {
   all ec2_instances as _, instance {
     instance.change.after.instance_type in allowed_types and #check if instance type is part of the allowed list
+    #instance.change.after.root_block_device[0].encrypted is true and #root_block_device[0] selects the first element and checks if encrypted is set to true
     instance.change.after.metadata_options[0].http_tokens is "required" #metadata_options[0] selects the first element and checks if http_tokens is set.
   }
 }
