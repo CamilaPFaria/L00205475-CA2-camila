@@ -20,3 +20,8 @@ policy "restrict-ebs-encryption"{
     source            = "./restrict-ebs-encryption.sentinel"
     enforcement_level = "hard-mandatory"
 }
+
+policy "restrict-aws-network" {
+  source            = "./restrict-aws-network.sentinel"
+  enforcement_level = "hard-mandatory"
+}

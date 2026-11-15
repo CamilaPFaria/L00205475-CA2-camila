@@ -20,3 +20,13 @@ variable "aws_ebs_volume" {
     default     =  20
     
 }
+variable "vpc_id" {
+  description = "ID of the VPC where the Security Group will be created"
+  type        = string
+}
+
+variable "admin_ip" {
+  description = "Trusted IP for administrative SSH access"
+  type        = string
+  default     = "109.255.0.1/32" # Replace with your specific IP/subnet
+}
