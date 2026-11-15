@@ -1,14 +1,18 @@
 import "tfplan/v2" as tfplan
 
-# Safely filter all managed aws_ebs_volume resources being created or updated
-ebs_volumes = filter tfplan.resource_changes as _, rc {
+# Safely default to an empty list if tfplan.resource_changes is undefined
+resource_changes = tfplan.resource_changes else []
+
+# Filter for EBS volumes being created or updated
+ebs_volumes = filter resource_changes as _, rc {
   rc.type is "aws_ebs_volume" and
   rc.mode is "managed" and
   (rc.change.actions contains "create" or rc.change.actions contains "update")
 }
 
+# Ensure all EBS volumes have encrypted set to true
 main = rule {
   all ebs_volumes as _, volume {
-    (volume.change.after.encrypted else false) is true
+    volume.change.after.encrypted is true
   }
 }

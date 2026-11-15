@@ -1,68 +1,75 @@
-#Ireland is the default deployment region for the resources considering the sovereignty and data residency requirements of the EU.
+# Ireland is the default deployment region for the resources considering the sovereignty and data residency requirements of the EU.
 provider "aws" {
-  region = "eu-west-1" 
+  region = var.aws_region
 }
 
 resource "aws_default_vpc" "default" {
   tags = { Name = "Default VPC" }
 }
 
-#Use data sources to query AWS for information about existing resources. 
-#In this case, the latest Ubuntu AMI will be queried and used to launch EC2 instances in the specified regions.
-#Ref.: https://developer.hashicorp.com/terraform/tutorials/aws-get-started/aws-create
+# Use data sources to query AWS for information about existing resources. 
+# In this case, the latest Ubuntu AMI will be queried and used to launch EC2 instances in the specified regions.
+# Ref.: https://developer.hashicorp.com/terraform/tutorials/aws-get-started/aws-create
 data "aws_ami" "ubuntu" {
   most_recent = true
   filter {
-    name = "name"
+    name   = "name"
     values = ["ubuntu/images/hvm-ssd-gp3/ubuntu-noble-24.04-amd64-server-*"]
   }
   owners = ["099720109477"] # Canonical
 }
 
-#Instance type is set to t3.micro, which is a cost-effective option for small workloads and testing purposes.
+# Web Server EC2 instance using parameterized settings
 resource "aws_instance" "web" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.micro"
-  availability_zone = "eu-west-1a"
-  tags = { Name = "Web Server" , Sovereignty = "EU-only" }
+  ami               = data.aws_ami.ubuntu.id
+  instance_type     = var.instance_type
+  availability_zone = var.availability_zone
+  tags              = { Name = "Web Server", Sovereignty = var.sovereignty_tag }
 
-  #The metadata_options block is used to configure the instance metadata service (IMDS) settings for the EC2 instance.
-  #Ref.: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_instance_metadata_defaults
+  # The metadata_options block is used to configure the instance metadata service (IMDS) settings for the EC2 instance.
+  # Ref.: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ec2_instance_metadata_defaults
   metadata_options {
-    http_tokens                 = "required" # Enforces IMDSv2
-    http_endpoint               = "enabled"  # Enables metadata service
-}
-  root_block_device {#Enables root disk encryption for the EC2 instance.
+    http_tokens   = "required" # Enforces IMDSv2
+    http_endpoint = "enabled"  # Enables metadata service
+  }
+
+  root_block_device {
     encrypted = true
   }
 }
-#EC2 instance to host the database server.
+
+# EC2 instance to host the database server.
 resource "aws_instance" "db-server" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = "t3.micro"
-  availability_zone = "eu-west-1a"
-  tags = { Name = "Database server", Sovereignty = "EU-only" }
+  ami               = data.aws_ami.ubuntu.id
+  instance_type     = var.instance_type
+  availability_zone = var.availability_zone
+  tags              = { Name = "Database server", Sovereignty = var.sovereignty_tag }
+
   metadata_options {
-    http_tokens                 = "required" # Enforces IMDSv2
-    http_endpoint               = "enabled"  # Enables metadata service
-}
-  root_block_device {#Enables root disk encryption for the EC2 instance.
+    http_tokens   = "required" # Enforces IMDSv2
+    http_endpoint = "enabled"  # Enables metadata service
+  }
+
+  root_block_device {
     encrypted = true
   }
 }
-#it makes sure that the data is encrypted for all ebs resources created in the account even if not explicitly specified in the resource definition.
+
+# Enables default EBS encryption across the account/region
 resource "aws_ebs_encryption_by_default" "enable" {
   enabled = true
 }
-#EBS volume to be attached to the database server instance.
+
+# EBS volume to be attached to the database server instance.
 resource "aws_ebs_volume" "database" {
-  availability_zone = "eu-west-1a"
-  size              = 50
-  encrypted         = true #enable encryption for the EBS volume
-  tags = { Name = "Database Volume", Sovereignty = "EU-only" }
+  availability_zone = var.availability_zone
+  size              = var.db_volume_size
+  encrypted         = true
+  tags              = { Name = "Database Volume", Sovereignty = var.sovereignty_tag }
 }
+
 resource "aws_volume_attachment" "db-attach" {
-  device_name = "/dev/sdh"
+  device_name = var.db_device_name
   volume_id   = aws_ebs_volume.database.id
   instance_id = aws_instance.db-server.id
 }
@@ -93,6 +100,7 @@ resource "aws_security_group" "web-server-sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 }
+
 # Database Security Group: Denies all public access, allows ONLY Web SG
 resource "aws_security_group" "db-server-sg" {
   name        = "db-server-sg"
@@ -129,5 +137,3 @@ resource "aws_security_group" "db-server-sg" {
     Name = "db-server-sg"
   }
 }
-
-
